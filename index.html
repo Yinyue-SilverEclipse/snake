@@ -28,10 +28,10 @@
 			var keyPressed=false;
 			var started=false
 			var tick=175; //in milliseconds it takes to go from one square to the next
-			var direction //north, east, south, west
+			var direction=null //north, east, south, west
 			var score=0;
 			var snakeX=0;
-			var snakeY=7;
+			var snakeY=7;																	
 			
 			ctx.fillStyle = "beige";
 			ctx.fillRect(0,0, canvas.width, canvas.height);
@@ -49,23 +49,30 @@
 				ctx.fillStyle="#06d63e";
 				ctx.fillRect(x*cellSize,y*cellSize,cellSize,cellSize);
 			}
+			function setY(){
+				snakeY=Math.round(snakeY);
+			}
+			function setX(){
+				snakeX=Math.round(snakeX);
+			}
 			function move(){
 				createGrid();
 				console.log(snakeX+', '+snakeY);
 				if (direction=='e'){
 					snakeX+=(1/60)*(1000/tick);
-					
+					setY();
 				} else if (direction=='w'){
 					snakeX-=(1/60)*(1000/tick);
-					
+					setY();
+				} else if (direction=='s'){
+					snakeY+=(1/60)*(1000/tick);
+					setX();
+					console.log('up');
 				} else if (direction=='n'){
 					snakeY-=(1/60)*(1000/tick);
-					
-					console.log('up');
-				} else if (direction='s'){
-					snakeY+=(1/60)*(1000/tick);
-					
-					console.log('down');
+					setX();
+				} else if (!['n','e','s','w'].includes(direction)){
+					console.log(direction);
 				}
 				if (snakeX>=gridSize-1 && direction=='e' || snakeX<=0 && direction=='w' || snakeY>=gridSize-1&&direction=='s'||snakeY<=0&&direction=='n'){
 					gameOver();
@@ -92,20 +99,20 @@
 			});
 			document.addEventListener('keydown', function changeDirection(event){
 				if (keyPressed==false)
-					if(event.key=='ArrowUp'){
+					if(event.key=='ArrowUp'&&direction!='s'){
 						direction='n';
 						keyPressed=true;
 					}
-					if(event.key=='ArrowRight'){
+					if(event.key=='ArrowRight'&&direction!='w'){
 						direction='e';
 						keyPressed=true;
 					}
-					if(event.key=='ArrowDown'){
+					if(event.key=='ArrowDown'&&direction!='n'){
 						direction='s';
 						console.log('down');
 						keyPressed=true;
 					}
-					if(event.key=='ArrowLeft'){
+					if(event.key=='ArrowLeft'&&direction!='e'){
 						direction='w';
 						keyPressed=true;
 					}
