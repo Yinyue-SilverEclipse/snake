@@ -1,0 +1,115 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Snake I guess</title>
+	</head>
+	<body>
+		<canvas id="gameCanvas" width="500" height="500"></canvas>
+		<style>
+		body {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			margin: 0; 
+			background-color: #f0f0f0; 
+		}
+		
+		canvas {
+			border: 4px solid #333
+		}
+		</style>
+		<script>
+			const canvas = document.getElementById("gameCanvas");
+			const ctx = canvas.getContext("2d");
+			const gridSize=15;
+			const cellSize=canvas.width/gridSize;
+			
+			var keyPressed=false;
+			var started=false
+			var tick=175; //in milliseconds it takes to go from one square to the next
+			var direction //north, east, south, west
+			var score=0;
+			var snakeX=0;
+			var snakeY=7;
+			
+			ctx.fillStyle = "beige";
+			ctx.fillRect(0,0, canvas.width, canvas.height);
+			
+			function createGrid(){
+				for (let i=0;i<gridSize;i++){
+					for (let p=0;p<gridSize;p++){
+						ctx.fillStyle=(i+p) % 2===0 ? "#f5deb3" : "#e0c097";
+						ctx.fillRect(p*cellSize,i*cellSize,cellSize,cellSize);
+					}
+				}
+				
+			}
+			function drawSnake(x,y) {
+				ctx.fillStyle="#06d63e";
+				ctx.fillRect(x*cellSize,y*cellSize,cellSize,cellSize);
+			}
+			function move(){
+				createGrid();
+				console.log(snakeX+', '+snakeY);
+				if (direction=='e'){
+					snakeX+=(1/60)*(1000/tick);
+					
+				} else if (direction=='w'){
+					snakeX-=(1/60)*(1000/tick);
+					
+				} else if (direction=='n'){
+					snakeY-=(1/60)*(1000/tick);
+					
+					console.log('up');
+				} else if (direction='s'){
+					snakeY+=(1/60)*(1000/tick);
+					
+					console.log('down');
+				}
+				if (snakeX>=gridSize-1 && direction=='e' || snakeX<=0 && direction=='w' || snakeY>=gridSize-1&&direction=='s'||snakeY<=0&&direction=='n'){
+					gameOver();
+				} else {
+					setTimeout(move, 1000/60);
+					for (let i=0;i<score+1;i++){
+						drawSnake(snakeX,snakeY);
+						keyPressed=false;
+					}
+				}
+			}
+			
+			function gameOver(){
+				console.log('Game Over');
+			}
+			createGrid();
+			drawSnake(0,7);
+			document.addEventListener('keydown', function h(){
+				if (started==false){
+					move();
+					started=true;
+					console.log('test');
+				}
+			});
+			document.addEventListener('keydown', function changeDirection(event){
+				if (keyPressed==false)
+					if(event.key=='ArrowUp'){
+						direction='n';
+						keyPressed=true;
+					}
+					if(event.key=='ArrowRight'){
+						direction='e';
+						keyPressed=true;
+					}
+					if(event.key=='ArrowDown'){
+						direction='s';
+						console.log('down');
+						keyPressed=true;
+					}
+					if(event.key=='ArrowLeft'){
+						direction='w';
+						keyPressed=true;
+					}
+				});
+		</script>
+	</body>
+</html>
