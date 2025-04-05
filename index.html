@@ -22,7 +22,7 @@
 		<script>
 			const canvas = document.getElementById("gameCanvas");
 			const ctx = canvas.getContext("2d");
-			const gridSize=15;
+			const gridSize=17;
 			const cellSize=canvas.width/gridSize;
 			
 			var keyPressed=false;
@@ -30,9 +30,13 @@
 			var tick=175; //in milliseconds it takes to go from one square to the next
 			var direction=null //north, east, south, west
 			var prevDir=null
-			var score=3;
+			var score=1;
 			var snakeX=[2];
-			var snakeY=[2];		
+			var snakeY=[Math.floor(gridSize/2)];
+			var prevX=[];
+			var prevY=[];
+			var appleX=[Math.floor(Math.random()*(gridSize))];
+			var appleY=[Math.floor(Math.random()*(gridSize))];
 			
 			ctx.fillStyle = "beige";
 			ctx.fillRect(0,0, canvas.width, canvas.height);
@@ -46,8 +50,8 @@
 				}
 				
 			}
-			function drawSnake(x,y) {
-				ctx.fillStyle="#06d63e";
+			function drawSnake(x,y,r,g,b) {
+				ctx.fillStyle="rgb("+r+","+g+","+b+")";
 				ctx.fillRect(x*cellSize,y*cellSize,cellSize,cellSize);
 			}
 			function setY(i){
@@ -69,7 +73,7 @@
 			
 			function move(){
 				createGrid();
-				console.log(snakeX+', '+snakeY);
+				//console.log(snakeX+', '+snakeY);
 				if (direction=='e'){
 					snakeX.unshift(snakeX[0]+=(1/60)*(1000/tick));
 					setY(0);
@@ -79,20 +83,20 @@
 				} else if (direction=='s'){
 					snakeY.unshift(snakeY[0]+=(1/60)*(1000/tick));
 					setX(0);
-					console.log('up');
+					//console.log('up');
 				} else if (direction=='n'){
 					snakeY.unshift(snakeY[0]-=(1/60)*(1000/tick));
 					setX(0);
 				} else if (!['n','e','s','w'].includes(direction)){
-					console.log(direction);
+					//console.log(direction);
 				}
 				if (snakeX[0]>=gridSize-1 && direction=='e' || snakeX[0]<=0 && direction=='w' || snakeY[0]>=gridSize-1&&direction=='s'||snakeY[0]<=0&&direction=='n'){
 					gameOver();
 				} else {
 					setTimeout(move, 1000/60);
-					for (let i=0;i<score;i++){
+					for (let i=0;i<score*10;i++){
 						
-						drawSnake(snakeX[i*10],snakeY[i*10]);
+						drawSnake(snakeX[i],snakeY[i],75-i,200-(i/5),50-i);
 						
 					}
 					while (snakeX.length>score*60){
@@ -103,12 +107,33 @@
 					}
 				}
 			}
-			
+			function spawnApple(){
+				ctx.fillStyle="#ff0000";
+				ctx.fillRect(appleX[0]*cellSize,appleY[0]*cellSize,cellSize,cellSize);
+				if (Math.round(snakeX[0])==appleX[0]&&Math.round(snakeY[0])==appleY[0]){
+					score++;
+					appleX.unshift(Math.floor(Math.random()*(gridSize)));
+					appleY.unshift(Math.floor(Math.random()*(gridSize)));
+					do {
+						appleX[0]=Math.floor(Math.random()*(gridSize));
+						appleY[0]=Math.floor(Math.random()*(gridSize));
+						
+					} while (appleX[0]==appleX[1]&&appleY[0]==appleY[1]);
+					for (let i=0;i<score*10;i++){
+						if (appleX[0]==Math.round(snakeX[i])&&appleY[0]==Math.round(snakeY[i])){
+							appleX[0]=Math.floor(Math.random()*(gridSize+1));
+							appleY[0]=Math.floor(Math.random()*(gridSize+1));
+						}
+					}
+					console.log(appleX[0]+', '+appleY[0]);
+				}
+				window.requestAnimationFrame(spawnApple);
+			}
 			function gameOver(){
-				console.log('Game Over');
+				//console.log('Game Over');
 			}
 			createGrid();
-			drawSnake(snakeX,snakeY);
+			drawSnake(snakeX,snakeY,75,200,50);
 			document.addEventListener('keydown', function h(){
 				if (started==false){
 					move();
@@ -134,7 +159,7 @@
 					if(event.key=='ArrowDown'&&direction!='n'){
 						prevDir=direction;
 						direction='s';
-						console.log('down');
+						//console.log('down');
 						keyPressed=true;
 					}
 					if(event.key=='ArrowLeft'&&direction!='e'){
@@ -145,6 +170,7 @@
 					thing();//setTimeout(thing, 0.25*tick);
 				}
 				});
+				spawnApple();
 		</script>
 	</body>
 </html>
